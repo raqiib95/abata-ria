@@ -1,0 +1,1350 @@
+<html lang="ms"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abata Ria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Montserrat:wght@400;600;700&display=swap');
+        
+        :root {
+            --primary: #2c3e50;
+            --secondary: #e74c3c;
+            --accent: #f39c12;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f8f9fa;
+            direction: ltr;
+        }
+        
+        .arabic {
+            font-family: 'Amiri', serif;
+            direction: rtl;
+        }
+        
+        .board-cell {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .board-cell:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .player-token {
+            transition: all 0.5s ease;
+        }
+        
+        .dice {
+            transition: transform 0.6s ease;
+        }
+        
+        .dice.rolling {
+            transform: rotateZ(720deg);
+        }
+        
+        .modal {
+            backdrop-filter: blur(5px);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1a2530;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .category-cell {
+            border-width: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .category-cell:hover {
+            transform: scale(1.03);
+        }
+        
+        /* Category colors */
+        .cat-clothes { border-color: #e74c3c; background-color: #fadbd8; }
+        .cat-colors { border-color: #3498db; background-color: #d6eaf8; }
+        .cat-house { border-color: #2ecc71; background-color: #d5f5e3; }
+        .cat-school { border-color: #f1c40f; background-color: #fef9e7; }
+        .cat-animals { border-color: #9b59b6; background-color: #ebdef0; }
+        .cat-food { border-color: #e67e22; background-color: #fae5d3; }
+        .cat-drinks { border-color: #1abc9c; background-color: #d1f2eb; }
+        .cat-kitchen { border-color: #34495e; background-color: #ebedef; }
+        .cat-start { border-color: #16a085; background-color: #d1f2eb; }
+        .cat-mystery { border-color: #8e44ad; background-color: #ebdef0; }
+        
+        .timer-bar {
+            transition: width 1s linear;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f39c12;
+            border-radius: 50%;
+            animation: fall 3s ease-in infinite;
+        }
+        
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        .copyright {
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <!-- Copyright notice (visible on all screens) -->
+    <div class="copyright">© 2025 Hak Cipta Abdul Raqiib Basiran &amp; Iqraq Education</div>
+    
+    <!-- Start Screen -->
+    <div id="start-screen" class="flex flex-col items-center justify-center min-h-screen p-4">
+        <div class="w-full max-w-3xl bg-white rounded-xl shadow-xl p-8 text-center">
+            <h1 class="text-5xl font-bold mb-6 text-primary bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Abata Ria</h1>
+            <p class="mb-8 text-gray-600">Permainan pembelajaran Bahasa Arab yang menyeronokkan!</p>
+            
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold mb-3">Bilangan Pemain</h2>
+                <div class="flex justify-center gap-3 mb-6">
+                    <button class="player-btn w-12 h-12 rounded-full bg-gray-200 hover:bg-blue-500 hover:text-white transition-all" data-players="1">1</button>
+                    <button class="player-btn w-12 h-12 rounded-full bg-gray-200 hover:bg-blue-500 hover:text-white transition-all" data-players="2">2</button>
+                    <button class="player-btn w-12 h-12 rounded-full bg-gray-200 hover:bg-blue-500 hover:text-white transition-all" data-players="3">3</button>
+                    <button class="player-btn w-12 h-12 rounded-full bg-gray-200 hover:bg-blue-500 hover:text-white transition-all" data-players="4">4</button>
+                    <button class="player-btn w-12 h-12 rounded-full bg-gray-200 hover:bg-blue-500 hover:text-white transition-all" data-players="5">5</button>
+                    <button class="player-btn w-12 h-12 rounded-full bg-gray-200 hover:bg-blue-500 hover:text-white transition-all" data-players="6">6</button>
+                </div>
+                
+                <h2 class="text-xl font-semibold mb-3">Tempoh Masa</h2>
+                <div class="mb-2 text-sm flex justify-between px-1">
+                    <span>5 minit</span>
+                    <span>1 jam</span>
+                </div>
+                <input type="range" id="game-duration" min="5" max="60" value="15" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                <p class="mt-2"><span id="duration-display">15</span> minit</p>
+            </div>
+            
+            <div id="player-names-container" class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Player name inputs will be generated here -->
+            </div>
+            
+            <button id="start-game-btn" class="btn-primary px-8 py-3 rounded-full text-lg font-bold shadow-lg">Mula Bermain</button>
+        </div>
+    </div>
+    
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden min-h-screen p-4">
+        <div class="container mx-auto">
+            <!-- Game Header -->
+            <div class="bg-white rounded-xl shadow-lg p-4 mb-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <h1 class="text-3xl font-bold text-primary mb-2 md:mb-0">Abata Ria</h1>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-gray-100 rounded-lg p-2">
+                            <div class="text-sm text-gray-600">Masa</div>
+                            <div class="flex items-center">
+                                <div class="w-48 bg-gray-200 rounded-full h-2.5">
+                                    <div id="timer-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 100%"></div>
+                                </div>
+                                <span id="timer-display" class="ml-2 font-bold">15:00</span>
+                            </div>
+                        </div>
+                        
+                        <button id="pause-btn" class="btn-secondary px-4 py-2 rounded-lg">Jeda</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Game Content -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Left Column - Player Info -->
+                <div class="bg-white rounded-xl shadow-lg p-4">
+                    <h2 class="text-xl font-bold mb-4">Pemain</h2>
+                    <div id="players-container" class="space-y-4">
+                        <!-- Player info will be generated here -->
+                    </div>
+                </div>
+                
+                <!-- Middle Column - Game Board -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-lg p-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-bold">Papan Permainan</h2>
+                            <div class="flex space-x-2">
+                                <button id="roll-dice" class="btn-primary px-4 py-2 rounded-lg">Lambung Dadu</button>
+                            </div>
+                        </div>
+                        
+                        <div class="relative">
+                            <!-- Dice -->
+                            <div id="dice-container" class="absolute top-4 right-4 bg-white p-2 rounded-lg shadow-md z-10">
+                                <div id="dice" class="w-16 h-16 bg-white rounded-lg border-2 border-gray-300 flex items-center justify-center text-2xl font-bold">
+                                    <span id="dice-value">?</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Game Board Grid -->
+                            <div id="game-board" class="grid grid-cols-5 gap-2 p-2 bg-gray-100 rounded-lg">
+                                <!-- Board cells will be generated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Challenge Modal -->
+    <div id="challenge-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="challenge-title" class="text-2xl font-bold">Cabaran</h2>
+                <div class="flex items-center">
+                    <span id="challenge-timer" class="mr-2 font-bold">30</span>
+                    <span>saat</span>
+                </div>
+            </div>
+            
+            <div id="challenge-category" class="mb-4 p-3 rounded-lg bg-blue-100 text-center">
+                <span class="font-bold">Kategori: </span>
+                <span id="challenge-category-name">الْمَلَابِسُ</span>
+            </div>
+            
+            <div id="challenge-content" class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <!-- Challenge content will be generated here -->
+            </div>
+            
+            <div id="challenge-answer-container" class="mb-6">
+                <!-- Answer display will be generated here -->
+            </div>
+            
+            <div class="flex justify-end">
+                <div class="space-x-3">
+                    <button id="fail-btn" class="btn-danger px-6 py-2 rounded-lg">Gagal</button>
+                    <button id="success-btn" class="btn-success px-6 py-2 rounded-lg">Selesai</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Result Modal -->
+    <div id="result-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 text-center">
+            <h2 id="result-title" class="text-2xl font-bold mb-4">Tahniah!</h2>
+            <div id="result-content" class="mb-6">
+                <!-- Result content will be generated here -->
+            </div>
+            <div id="result-points" class="text-xl font-bold mb-6">
+                <!-- Points awarded will be shown here -->
+            </div>
+            <button id="continue-btn" class="btn-primary px-6 py-2 rounded-lg">Teruskan</button>
+        </div>
+    </div>
+    
+    <!-- Mystery Modal -->
+    <div id="mystery-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 text-center">
+            <h2 class="text-2xl font-bold mb-4">Petak Misteri!</h2>
+            <div id="mystery-content" class="mb-6 p-4 bg-purple-50 rounded-lg">
+                <!-- Mystery content will be generated here -->
+            </div>
+            <button id="mystery-continue-btn" class="btn-primary px-6 py-2 rounded-lg">Teruskan</button>
+        </div>
+    </div>
+    
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">Permainan Tamat!</h2>
+            <div id="winner-announcement" class="mb-6 text-xl">
+                <!-- Winner announcement will be generated here -->
+            </div>
+            <div id="final-scores" class="mb-6">
+                <!-- Final scores will be generated here -->
+            </div>
+            <div class="flex justify-center space-x-4">
+                <button id="new-game-btn" class="btn-primary px-6 py-2 rounded-lg">Permainan Baru</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pause Modal -->
+    <div id="pause-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 text-center">
+            <h2 class="text-2xl font-bold mb-4">Permainan Dijeda</h2>
+            <p class="mb-6">Klik butang di bawah untuk meneruskan permainan.</p>
+            <button id="resume-btn" class="btn-primary px-6 py-2 rounded-lg">Teruskan</button>
+        </div>
+    </div>
+
+    <script>
+        // Game data
+        const categories = {
+            start: {
+                name: "MULA",
+                color: "cat-start",
+                words: []
+            },
+            clothes: {
+                name: "الْمَلَابِسُ",
+                color: "cat-clothes",
+                words: ["قَمِيصٌ", "بَنْطَلُونٌ", "حِزَامٌ", "جَوْرَبٌ", "حِذَاءٌ", "خِمَارٌ", "فُسْتَانٌ", "مِنْدِيلٌ", "نَظَّارَةٌ"]
+            },
+            colors: {
+                name: "الْأَلْوَانُ",
+                color: "cat-colors",
+                words: ["أَسْوَدُ", "أَبْيَضُ", "أَزْرَقُ", "أَحْمَرُ", "أَصْفَرُ", "أَخْضَرُ", "بُنِّيٌّ", "رَمَادِيٌّ", "بَنَفْسَجِيٌّ", "وَرْدِيٌّ", "بُرْتُقَالِيٌّ"]
+            },
+            house: {
+                name: "فِي الْبَيْتِ",
+                color: "cat-house",
+                words: ["وِسَادَةٌ", "سَرِيرٌ", "سِتَارٌ", "سُلَّمٌ", "سَاعَةٌ", "مَخْزَنٌ", "كَنَبَةٌ", "طَاوِلَةٌ", "تِلْفِزِيُونٌ", "غُرْفَةُ الضُّيُوفِ", "غُرْفَةُ النَّوْمِ", "صَالَةُ الطَّعَامِ", "حَمَّامٌ"]
+            },
+            school: {
+                name: "حَوْلَ الْمَدْرَسَةِ",
+                color: "cat-school",
+                words: ["مَلْعَبٌ", "إِدَارَةٌ", "فَصْلٌ", "حَدِيقَةٌ", "فِنَاءٌ", "قَاعَةٌ", "مُصَلَّى", "مَطْعَمٌ", "مَكْتَبَةٌ", "غُرْفَةُ الْمُعَلِّمِينَ", "غُرْفَةُ الْمُدِيرِ", "مَعْمَلُ الْعُلُومِ", "مَعْمَلُ الْكُمْبِيُوتَرِ", "دُكَّانُ الْمَدْرَسَةِ"]
+            },
+            animals: {
+                name: "الْحَيَوَانَاتُ",
+                color: "cat-animals",
+                words: ["نَمِرٌ", "دُبٌّ", "قِرْدٌ", "ثُعْبَانٌ", "أَسَدٌ", "تِمْسَاحٌ", "فِيلٌ", "دِيكٌ", "مَاعِزٌ", "أَرْنَبٌ", "قِطٌّ", "بَقَرَةٌ", "بَطٌّ", "حَمَامَةٌ", "عُصْفُورٌ", "بَبْغَاءُ", "حُوتٌ", "سَرَطَانٌ", "فَرَاشَةٌ", "جَرَادَةٌ"]
+            },
+            food: {
+                name: "الْمَأْكُولَاتُ",
+                color: "cat-food",
+                words: ["أَرُزٌّ", "مَكَرُونَةٌ", "خُبْزٌ", "كَعْكٌ", "دَجَاجٌ", "سَمَكٌ", "لَحْمٌ", "خَضْرَاوَاتٌ", "فَوَاكِهُ"]
+            },
+            drinks: {
+                name: "الْمَشْرُوبَاتُ",
+                color: "cat-drinks",
+                words: ["مَاءٌ", "شَايٌ", "قَهْوَةٌ", "حَلِيبٌ", "عَصِيرٌ", "بُوظَةٌ"]
+            },
+            kitchen: {
+                name: "فِي الْمَطْبَخِ",
+                color: "cat-kitchen",
+                words: ["صَحْنٌ", "فِنْجَانٌ", "كُوبٌ", "شَوْكَةٌ", "مِلْعَقَةٌ", "مِغْرَفَةٌ", "قِدْرٌ", "مِقْلَاةٌ", "مَوْقِدٌ", "غَازٌ", "إِبْرِيقٌ", "غَلَّايَةٌ", "ثَلَّاجَةٌ", "خَلَّاطٌ"]
+            },
+            mystery: {
+                name: "MISTERI",
+                color: "cat-mystery",
+                words: []
+            }
+        };
+        
+        const challenges = [
+            {
+                id: 1,
+                name: "SEBUT 3 PERKATAAN",
+                description: "Sila sebut 3 perkataan dalam kategori ini:",
+                points: 5,
+                generateChallenge: function(category) {
+                    return {
+                        question: `Sila sebut 3 perkataan dalam kategori ${category.name}:`,
+                        answer: category.words.slice(0, 3).join(", ")
+                    };
+                }
+            },
+            {
+                id: 2,
+                name: "BETUL/SALAH",
+                description: "Adakah perkataan ini tergolong dalam kategori ini?",
+                points: 3,
+                generateChallenge: function(category) {
+                    const allWords = Object.values(categories).flatMap(cat => cat.words);
+                    const isCorrect = Math.random() > 0.5;
+                    
+                    let word;
+                    if (isCorrect) {
+                        // Choose a word from the current category
+                        word = category.words[Math.floor(Math.random() * category.words.length)];
+                    } else {
+                        // Choose a word from other categories
+                        let otherWords = allWords.filter(w => !category.words.includes(w));
+                        word = otherWords[Math.floor(Math.random() * otherWords.length)];
+                    }
+                    
+                    return {
+                        question: `Adakah perkataan <span class="arabic text-xl font-bold">${word}</span> tergolong dalam kategori ${category.name}?`,
+                        answer: isCorrect ? "Betul" : "Salah"
+                    };
+                }
+            },
+            {
+                id: 3,
+                name: "BINA PERKATAAN",
+                description: "Susun huruf-huruf berikut untuk membentuk perkataan:",
+                points: 8,
+                generateChallenge: function(category) {
+                    const word = category.words[Math.floor(Math.random() * category.words.length)];
+                    // Remove diacritics and shuffle letters
+                    const plainWord = word.replace(/[\u064B-\u0652]/g, ''); // Remove tashkeel
+                    const letters = plainWord.split('');
+                    
+                    // Shuffle letters
+                    for (let i = letters.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [letters[i], letters[j]] = [letters[j], letters[i]];
+                    }
+                    
+                    return {
+                        question: `Susun huruf-huruf berikut untuk membentuk perkataan dalam kategori ${category.name}:<br><div class="arabic text-3xl font-bold my-4 flex flex-wrap justify-center gap-2">${letters.map(l => `<span class="bg-blue-100 p-2 rounded">${l}</span>`).join('')}</div>`,
+                        answer: word
+                    };
+                }
+            },
+            {
+                id: 4,
+                name: "SIAPA SAYA",
+                description: "Teka siapa saya berdasarkan deskripsi berikut:",
+                points: 7,
+                generateChallenge: function(category) {
+                    const wordDescriptions = {
+                        // Clothes
+                        "قَمِيصٌ": "Saya adalah pakaian yang dipakai di bahagian atas badan. Saya mempunyai butang di hadapan dan lengan yang menutupi tangan. Saya biasanya diperbuat daripada kain kapas.",
+                        "بَنْطَلُونٌ": "Saya adalah pakaian yang menutupi bahagian bawah badan dari pinggang hingga ke kaki. Saya mempunyai dua lubang untuk kaki dan biasanya mempunyai poket.",
+                        "حِزَامٌ": "Saya adalah aksesori yang dipakai di pinggang untuk mengetatkan seluar. Saya biasanya diperbuat daripada kulit.",
+                        "جَوْرَبٌ": "Saya dipakai di kaki sebelum memakai kasut. Saya melindungi kaki daripada geseran dengan kasut dan menyerap peluh.",
+                        "حِذَاءٌ": "Saya dipakai di kaki untuk melindungi kaki ketika berjalan. Saya mempunyai tapak yang keras dan bahagian atas yang menutupi kaki.",
+                        "خِمَارٌ": "Saya adalah penutup kepala untuk wanita muslimah. Saya menutupi rambut, leher dan sebahagian dada.",
+                        "فُسْتَانٌ": "Saya adalah pakaian wanita yang menutupi badan dari atas hingga bawah dalam satu helai. Saya tidak mempunyai bahagian yang berasingan seperti baju dan seluar.",
+                        "مِنْدِيلٌ": "Saya adalah kain kecil yang digunakan untuk mengelap atau membersihkan sesuatu. Saya boleh digunakan untuk mengelap tangan, mulut atau hidung.",
+                        "نَظَّارَةٌ": "Saya dipakai di mata untuk membantu penglihatan. Saya mempunyai dua kanta yang dipasang pada bingkai yang diletakkan di hidung dan telinga.",
+                        
+                        // Colors
+                        "أَسْوَدُ": "Saya adalah warna yang paling gelap, seperti warna arang atau langit pada waktu malam tanpa bulan. Saya adalah lawan kepada warna putih.",
+                        "أَبْيَضُ": "Saya adalah warna yang paling cerah, seperti warna susu atau salji. Saya adalah lawan kepada warna hitam.",
+                        "أَزْرَقُ": "Saya adalah warna langit pada siang hari dan juga warna laut yang dalam. Saya juga warna bagi banyak bunga seperti bunga telang.",
+                        "أَحْمَرُ": "Saya adalah warna darah dan juga warna api. Saya juga warna bagi buah epal dan buah strawberi.",
+                        "أَصْفَرُ": "Saya adalah warna cahaya matahari dan juga warna pisang dan lemon. Saya adalah warna yang cerah dan ceria.",
+                        "أَخْضَرُ": "Saya adalah warna daun dan rumput. Saya melambangkan alam semulajadi dan kehidupan. Saya juga warna yang dikaitkan dengan Islam.",
+                        "بُنِّيٌّ": "Saya adalah warna tanah dan juga warna manisan digemari ramai. Saya adalah warna kayu dan juga warna rambut bagi sesetengah orang.",
+                        "رَمَادِيٌّ": "Saya adalah warna di antara hitam dan putih. Saya adalah warna asap dan juga warna awan mendung.",
+                        "بَنَفْسَجِيٌّ": "Saya adalah warna bunga lavender. Saya adalah campuran warna biru dan merah. Saya dikaitkan dengan kemewahan.",
+                        "وَرْدِيٌّ": "Saya adalah warna lembut seperti warna bunga mawar. Saya sering diminati ramai terutamanya gadis muda.",
+                        "بُرْتُقَالِيٌّ": "Saya adalah warna buah oren. Saya adalah campuran warna merah dan kuning. Saya adalah warna yang cerah dan hangat.",
+                        
+                        // House
+                        "وِسَادَةٌ": "Saya adalah benda yang diletakkan di bawah kepala ketika tidur. Saya lembut dan biasanya diisi dengan kapas atau bulu.",
+                        "سَرِيرٌ": "Saya adalah tempat untuk tidur. Orang tidur di atas saya pada waktu malam.",
+                        "سِتَارٌ": "Saya digunakan untuk menutupi tingkap. Saya menghalang cahaya dan memberikan privasi. Saya biasanya diperbuat daripada kain.",
+                        "سُلَّمٌ": "Saya digunakan untuk menaiki tingkat yang lebih atas. Ramai juga menggunakan saya untuk mencapai benda yang tinggi.",
+                        "سَاعَةٌ": "Saya menunjukkan masa. Saya mempunyai jarum yang bergerak mengelilingi muka saya yang mempunyai angka dari 1 hingga 12.",
+                        "مَخْزَنٌ": "Saya adalah tempat untuk menyimpan barang. Saya biasanya berada di bahagian bawah rumah atau di luar rumah.",
+                        "كَنَبَةٌ": "Saya adalah tempat duduk yang panjang dan selesa. Saya boleh memuatkan beberapa orang sekaligus. Saya biasanya berada di ruang tamu.",
+                        "طَاوِلَةٌ": "Saya adalah perabot yang mempunyai permukaan rata dengan kaki. Orang meletakkan barang di atas saya atau duduk mengelilingi saya untuk makan.",
+                        "تِلْفِزِيُونٌ": "Saya adalah alat elektronik yang menayangkan program dan filem. Orang menonton saya untuk hiburan dan mendapatkan maklumat.",
+                        
+                        // School
+                        "مَلْعَبٌ": "Saya adalah tempat untuk bermain sukan di sekolah. Saya biasanya berada di luar bangunan dan mempunyai padang yang luas.",
+                        "إِدَارَةٌ": "Saya adalah tempat di mana pengetua dan guru-guru menguruskan hal sekolah. Saya adalah pejabat utama di sekolah.",
+                        "فَصْلٌ": "Saya adalah tempat di mana pelajar belajar. Saya mempunyai meja, kerusi dan papan tulis. Guru mengajar di hadapan saya.",
+                        "حَدِيقَةٌ": "Saya adalah kawasan hijau dengan pokok dan bunga di sekolah. Pelajar boleh berehat di saya pada waktu rehat.",
+                        "فِنَاءٌ": "Saya adalah kawasan terbuka di sekolah untuk berkumpul. Pelajar berbaris di saya pada waktu perhimpunan.",
+                        "قَاعَةٌ": "Saya adalah dewan besar di sekolah untuk perhimpunan. Saya boleh memuatkan semua pelajar dan guru sekolah.",
+                        "مُصَلَّى": "Saya adalah tempat untuk solat di sekolah. Pelajar dan guru menunaikan solat di saya pada waktu zohor dan asar.",
+                        "مَطْعَمٌ": "Saya adalah tempat untuk makan di sekolah. Pelajar membeli makanan dan makan di saya pada waktu rehat.",
+                        "مَكْتَبَةٌ": "Saya adalah tempat untuk membaca dan meminjam buku di sekolah. Saya mempunyai banyak buku dan tempat untuk membaca.",
+                        
+                        // Animals
+                        "نَمِرٌ": "Saya adalah haiwan buas yang mempunyai belang hitam dan oren pada badan saya. Saya adalah kucing besar yang hidup di hutan.",
+                        "دُبٌّ": "Saya adalah haiwan besar berbulu yang suka makan madu. Saya tidur sepanjang musim sejuk dalam gua.",
+                        "قِرْدٌ": "Saya adalah haiwan yang suka melompat dari pokok ke pokok. Saya mempunyai tangan dan kaki yang panjang dan boleh menggunakan alat.",
+                        "ثُعْبَانٌ": "Saya adalah haiwan yang merangkak tanpa kaki. Saya mempunyai badan yang panjang dan beberapa spesies saya berbisa.",
+                        "أَسَدٌ": "Saya adalah raja hutan. Saya mempunyai bulu leher yang tebal dan suara yang kuat. Saya adalah kucing besar yang hidup dalam kumpulan.",
+                        "تِمْسَاحٌ": "Saya adalah reptilia besar yang hidup di air dan darat. Saya mempunyai mulut yang besar dengan banyak gigi tajam.",
+                        "فِيلٌ": "Saya adalah haiwan terbesar di darat dengan belalai panjang. Saya mempunyai telinga yang besar dan gading yang panjang.",
+                        "دِيكٌ": "Saya adalah ayam jantan yang berkokok pada waktu pagi. Saya mempunyai balung merah di atas kepala saya.",
+                        "مَاعِزٌ": "Saya adalah haiwan yang menghasilkan susu dan mempunyai janggut. Saya mempunyai tanduk dan suka memanjat tempat tinggi.",
+                        "أَرْنَبٌ": "Saya adalah haiwan kecil dengan telinga panjang yang suka makan lobak. Saya boleh melompat dengan pantas dan mempunyai ekor berbulu.",
+                        
+                        // Food
+                        "أَرُزٌّ": "Saya adalah makanan asas yang berwarna putih dan dimakan dengan lauk. Saya ditanam di sawah dan merupakan makanan ruji di Asia.",
+                        "مَكَرُونَةٌ": "Saya adalah makanan dari tepung gandum berbentuk panjang. Saya berasal dari Itali dan boleh dimakan dengan pelbagai sos.",
+                        "خُبْزٌ": "Saya adalah makanan yang dibuat dari tepung dan dibakar. Saya biasanya berbentuk bulat atau segi empat dan mempunyai kulit yang keras.",
+                        "كَعْكٌ": "Saya adalah makanan manis yang biasanya dimakan pada hari istimewa seperti hari jadi. Saya biasanya dihias dengan krim dan coklat.",
+                        "دَجَاجٌ": "Saya adalah daging dari burung yang bertelur. Saya boleh dimasak dengan pelbagai cara seperti digoreng, dipanggang atau direbus.",
+                        "سَمَكٌ": "Saya adalah haiwan yang hidup di air dan dimakan sebagai lauk. Saya mempunyai sisik, sirip dan insang.",
+                        "لَحْمٌ": "Saya adalah daging dari haiwan seperti lembu atau kambing. Saya kaya dengan protein dan boleh dimasak dengan pelbagai cara.",
+                        
+                        // Drinks
+                        "مَاءٌ": "Saya adalah minuman paling penting, tiada warna, tiada rasa dan diperlukan oleh semua makhluk hidup.",
+                        "شَايٌ": "Saya adalah minuman panas yang dibuat dari daun. Saya boleh diminum dengan susu atau lemon.",
+                        "قَهْوَةٌ": "Saya adalah minuman panas berwarna hitam yang menghilangkan mengantuk. Saya dibuat dari biji yang dikisar dan direbus.",
+                        "حَلِيبٌ": "Saya adalah minuman putih yang diperah daripada lembu. Saya kaya dengan kalsium dan baik untuk tulang.",
+                        "عَصِيرٌ": "Saya adalah minuman yang dibuat dari buah-buahan. Saya boleh dibuat dari oren, epal, anggur dan banyak lagi.",
+                        "بُوظَةٌ": "Saya adalah minuman sejuk yang beku dan manis. Saya biasanya dimakan dengan kon atau dalam mangkuk.",
+                        
+                        // Kitchen
+                        "صَحْنٌ": "Saya adalah alat untuk meletakkan makanan ketika makan. Saya biasanya berbentuk bulat dan cetek.",
+                        "فِنْجَانٌ": "Saya adalah bekas kecil untuk minum kopi atau teh. Saya biasanya mempunyai telinga untuk dipegang.",
+                        "كُوبٌ": "Saya adalah bekas untuk minum air atau minuman lain. Saya biasanya tidak mempunyai telinga.",
+                        "شَوْكَةٌ": "Saya adalah alat dengan hujung tajam untuk menusuk makanan. Saya mempunyai beberapa cabang di hujung saya.",
+                        "مِلْعَقَةٌ": "Saya adalah alat dengan hujung bulat untuk menceduk makanan. Saya digunakan untuk makan sup atau bubur.",
+                        "مِغْرَفَةٌ": "Saya adalah alat untuk mengambil kuah. Saya mempunyai bekas yang dalam dan pemegang yang panjang.",
+                        "قِدْرٌ": "Saya adalah bekas besar untuk memasak makanan. Saya biasanya diperbuat daripada logam dan mempunyai penutup.",
+                        "مِقْلَاةٌ": "Saya adalah alat untuk menggoreng makanan. Saya mempunyai permukaan yang rata dan tepi yang rendah."
+                    };
+                    
+    // Tapis perkataan, ambil hanya yang ada description
+    const validWords = category.words.filter(w => wordDescriptions.hasOwnProperty(w));
+
+    // Kalau tak ada satu pun perkataan yang valid
+    if (validWords.length === 0) {
+        return {
+            question: "Tiada deskripsi untuk kategori ini.",
+            answer: "-"
+        };
+    }
+
+    // Pilih satu perkataan yang valid
+    const word = validWords[Math.floor(Math.random() * validWords.length)];
+    const description = wordDescriptions[word];
+
+    return {
+        question: `<div class="text-lg">${description}</div><p class="mt-4">Siapakah saya? (Jawab dalam Bahasa Arab)</p>`,
+        answer: word
+    };
+}
+            },
+            {
+                id: 5,
+                name: "TENTUKAN KATA TUNJUK",
+                description: "Pilih dua kata tunjuk yang sesuai untuk perkataan berikut:",
+                points: 6,
+generateChallenge: function(category) {
+    if (category.name === "الْأَلْوَانُ") {
+        const colorObjects = {
+            "أَسْوَدُ": "tayar <span class='text-3xl inline-block'>🛞</span>",
+            "أَبْيَضُ": "orang salji <span class='text-3xl inline-block'>⛄</span>",
+            "أَزْرَقُ": "laut <span class='text-3xl inline-block'>🌊</span>",
+            "أَحْمَرُ": "buah epal <span class='text-3xl inline-block'>🍎</span>",
+            "أَصْفَرُ": "pisang <span class='text-3xl inline-block'>🍌</span>",
+            "أَخْضَرُ": "daun pokok <span class='text-3xl inline-block'>🌿</span>",
+            "بُنِّيٌّ": "coklat bar <span class='text-3xl inline-block'>🍫</span>",
+            "رَمَادِيٌّ": "asap <span class='text-3xl inline-block'>💨</span>",
+            "بَنَفْسَجِيٌّ": "bunga ungu <span class='text-3xl inline-block'>🪻</span>",
+            "وَرْدِيٌّ": "gincu merah jambu <span class='text-3xl inline-block'>💄</span>",
+            "بُرْتُقَالِيٌّ": "buah oren <span class='text-3xl inline-block'>🍊</span>"
+        };
+
+        const word = category.words[Math.floor(Math.random() * category.words.length)];
+        const object = colorObjects[word] || "sesuatu";
+
+        return {
+            question: `Apakah warna <strong>${object}</strong>?`,
+            answer: word
+        };
+    }
+
+    // Untuk kategori lain, kekalkan soalan Tentukan Kata Tunjuk
+    const word = category.words[Math.floor(Math.random() * category.words.length)];
+    const isFeminine = word.includes('ةٌ') || word.includes('ةُ') || word.includes('ةَ') || word.includes('ةِ');
+
+    const nearDemonstratives = isFeminine ? "هذه" : "هذا";
+    const farDemonstratives = isFeminine ? "تلك" : "ذلك";
+
+    return {
+        question: `Pilih kata tunjuk yang sesuai untuk perkataan <span class="arabic text-xl font-bold">${word}</span>:<br><br>Kata tunjuk dekat: <span class="arabic">هذا / هذه</span><br>Kata tunjuk jauh: <span class="arabic">ذلك / تلك</span>`,
+        answer: `${nearDemonstratives} dan ${farDemonstratives}`
+    };
+}
+
+            },
+            {
+                id: 6,
+                name: "BINA AYAT",
+                description: "Bina ayat mudah menggunakan perkataan berikut:",
+                points: 10,
+                generateChallenge: function(category) {
+                    const word = category.words[Math.floor(Math.random() * category.words.length)];
+                    
+                    return {
+                        question: `Bina ayat mudah menggunakan perkataan <span class="arabic text-xl font-bold">${word}</span>`,
+                        answer: `Contoh: هذا ${word}`
+                    };
+                }
+            }
+        ];
+        
+        // Mystery effects - reduced to only 3 options
+        const mysteryEffects = [
+            {
+                name: "Hilang Giliran",
+                description: "Anda kehilangan giliran seterusnya!",
+                effect: (player) => {
+                    player.skipTurn = true;
+                    return "Anda akan kehilangan giliran seterusnya.";
+                }
+            },
+            {
+                name: "Tambah Markah",
+                description: "Anda mendapat tambahan markah!",
+                effect: (player) => {
+                    const points = Math.floor(Math.random() * 5) + 3; // 3-7 points
+                    player.score += points;
+                    return `Anda mendapat tambahan ${points} markah!`;
+                }
+            },
+            {
+                name: "Tolak Markah",
+                description: "Markah anda ditolak!",
+                effect: (player) => {
+                    const points = Math.floor(Math.random() * 3) + 1; // 1-3 points
+                    player.score = Math.max(0, player.score - points);
+                    return `Markah anda ditolak sebanyak ${points} markah!`;
+                }
+            },
+            {
+                name: "Giliran Berganda Akan Datang",
+                description: "Giliran anda akan dua kali pada pusingan seterusnya!",
+                effect: (player) => {
+                    player.extraTurn = true;
+                    return "Simpan nota ini: anda akan dapat 2 giliran berturut-turut pada pusingan seterusnya.";
+                }
+            },
+            {
+                name: "Doa Misteri",
+                description: "Anda mendapat doa kejayaan!",
+                effect: () => {
+                    const doas = [
+                    "Semoga anda cemerlang dunia & akhirat!",
+                    "Semoga sentiasa dalam keberkatan ilmu 🌟",
+                    "Semoga berjaya jawab semua soalan selepas ini!",
+                    "Semoga dikelilingi keberkatan dan keseronokan belajar!"
+                    ];
+                    return doas[Math.floor(Math.random() * doas.length)];
+                }
+           },
+           {
+                name: "Animasi Khas",
+                description: "Papan permainan bergegar seketika!",
+                effect: () => {
+                   // optionally trigger a CSS animation or confetti
+                   return "Woah! Anda mencetuskan gegaran pada papan! (Tiada kesan serius 😄)";
+    }
+}
+        ];
+        
+        // Game state
+        let gameState = {
+            players: [],
+            currentPlayerIndex: 0,
+            gameStarted: false,
+            gameDuration: 15, // minutes
+            gameTimer: null,
+            remainingTime: 0,
+            isPaused: false,
+            boardSize: 24, // Increased board size to accommodate Start and Mystery squares
+            board: [],
+            challengeTimer: null,
+            currentChallenge: null,
+            currentCategory: null
+        };
+        
+        // DOM Elements
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const playerNamesContainer = document.getElementById('player-names-container');
+        const playersContainer = document.getElementById('players-container');
+        const gameBoard = document.getElementById('game-board');
+        const challengeModal = document.getElementById('challenge-modal');
+        const resultModal = document.getElementById('result-modal');
+        const gameOverModal = document.getElementById('game-over-modal');
+        const pauseModal = document.getElementById('pause-modal');
+        const mysteryModal = document.getElementById('mystery-modal');
+        const durationDisplay = document.getElementById('duration-display');
+        const timerDisplay = document.getElementById('timer-display');
+        const timerBar = document.getElementById('timer-bar');
+        const dice = document.getElementById('dice');
+        
+        // Event Listeners
+        document.querySelectorAll('.player-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('bg-blue-500', 'text-white'));
+                btn.classList.add('bg-blue-500', 'text-white');
+                const numPlayers = parseInt(btn.dataset.players);
+                generatePlayerInputs(numPlayers);
+            });
+        });
+        
+        document.getElementById('game-duration').addEventListener('input', (e) => {
+            const duration = e.target.value;
+            durationDisplay.textContent = duration;
+            gameState.gameDuration = parseInt(duration);
+        });
+        
+        document.getElementById('start-game-btn').addEventListener('click', startGame);
+        document.getElementById('roll-dice').addEventListener('click', rollDice);
+        document.getElementById('pause-btn').addEventListener('click', togglePause);
+        document.getElementById('resume-btn').addEventListener('click', togglePause);
+        document.getElementById('success-btn').addEventListener('click', () => submitAnswer(true));
+        document.getElementById('fail-btn').addEventListener('click', () => submitAnswer(false));
+        document.getElementById('continue-btn').addEventListener('click', continueGame);
+        document.getElementById('mystery-continue-btn').addEventListener('click', continueMystery);
+        document.getElementById('new-game-btn').addEventListener('click', () => {
+            gameOverModal.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            gameScreen.classList.add('hidden');
+            resetGame();
+        });
+        
+        // Functions
+        function generatePlayerInputs(numPlayers) {
+            playerNamesContainer.innerHTML = '';
+            
+            for (let i = 0; i < numPlayers; i++) {
+                const playerDiv = document.createElement('div');
+                playerDiv.innerHTML = `
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Pemain ${i + 1}</label>
+                    <input type="text" class="player-name-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                           value="Pemain ${i + 1}" placeholder="Masukkan nama">
+                `;
+                playerNamesContainer.appendChild(playerDiv);
+            }
+        }
+        
+        function startGame() {
+            // Get player names
+            const playerInputs = document.querySelectorAll('.player-name-input');
+            if (playerInputs.length === 0) {
+                alert('Sila pilih bilangan pemain terlebih dahulu.');
+                return;
+            }
+            
+            gameState.players = [];
+            playerInputs.forEach((input, index) => {
+                gameState.players.push({
+                    id: index,
+                    name: input.value || `Pemain ${index + 1}`,
+                    position: 0,
+                    score: 0,
+                    color: getPlayerColor(index),
+                    skipTurn: false,
+                    extraTurn: false
+                });
+            });
+            
+            // Initialize game
+            gameState.gameStarted = true;
+            gameState.currentPlayerIndex = 0;
+            gameState.remainingTime = gameState.gameDuration * 60; // Convert to seconds
+            
+            // Generate board
+            generateBoard();
+            
+            // Update UI
+            updatePlayersUI();
+            updateTimerDisplay();
+            
+            // Start timer
+            startGameTimer();
+            
+            // Switch screens
+            startScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+        }
+        
+        function getPlayerColor(index) {
+            const colors = [
+                'bg-red-500',
+                'bg-blue-500',
+                'bg-green-500',
+                'bg-yellow-500',
+                'bg-purple-500',
+                'bg-pink-500'
+            ];
+            return colors[index % colors.length];
+        }
+        
+        function generateBoard() {
+            gameState.board = [];
+            gameBoard.innerHTML = '';
+            
+            // Create board cells
+            const categoryKeys = Object.keys(categories).filter(key => key !== 'start' && key !== 'mystery');
+            
+            // First cell is always START
+            gameState.board.push({
+                id: 0,
+                category: 'start',
+                players: []
+            });
+            
+            const startCell = document.createElement('div');
+            startCell.id = `cell-0`;
+            startCell.className = `board-cell ${categories.start.color} p-3 rounded-lg shadow-md relative min-h-[100px] flex flex-col justify-between`;
+            
+            startCell.innerHTML = `
+                <div class="text-center font-bold text-xl">MULA</div>
+                <div id="players-at-0" class="flex justify-center mt-2 gap-1"></div>
+            `;
+            
+            gameBoard.appendChild(startCell);
+            
+            // Generate the rest of the board
+let mysteryCount = 0; // tambah kiraan misteri
+
+for (let i = 1; i < gameState.boardSize; i++) {
+    let categoryKey;
+    
+    // Masukkan 3 misteri sahaja pada kedudukan rawak
+    if (mysteryCount < 3 && Math.random() < 0.15) {
+        categoryKey = 'mystery';
+        mysteryCount++;
+    } else {
+        const categoryIndex = (i - 1 - mysteryCount) % categoryKeys.length;
+        categoryKey = categoryKeys[categoryIndex];
+    }
+
+                const category = categories[categoryKey];
+                
+                gameState.board.push({
+                    id: i,
+                    category: categoryKey,
+                    players: []
+                });
+                
+                const cell = document.createElement('div');
+                cell.id = `cell-${i}`;
+                cell.className = `board-cell ${category.color} p-3 rounded-lg shadow-md relative min-h-[100px] flex flex-col justify-between`;
+                
+                if (categoryKey === 'mystery') {
+                    cell.innerHTML = `
+                        <div class="text-center font-bold text-xl">MISTERI</div>
+                        <div class="text-center text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div id="players-at-${i}" class="flex justify-center mt-2 gap-1"></div>
+                    `;
+                } else {
+                    cell.innerHTML = `
+                        <div class="text-center arabic font-bold">${category.name}</div>
+                        <div id="players-at-${i}" class="flex justify-center mt-2 gap-1"></div>
+                    `;
+                }
+                
+                gameBoard.appendChild(cell);
+            }
+            
+            // Place players at start
+            gameState.players.forEach(player => {
+                placePlayerOnBoard(player, 0);
+            });
+        }
+        
+        function placePlayerOnBoard(player, position) {
+            // Remove player from current position
+            if (player.position !== undefined) {
+                const oldCell = gameState.board[player.position];
+                if (oldCell) {
+                    oldCell.players = oldCell.players.filter(p => p !== player.id);
+                    updateCellPlayers(player.position);
+                }
+            }
+            
+            // Add player to new position
+            player.position = position;
+            gameState.board[position].players.push(player.id);
+            updateCellPlayers(position);
+        }
+        
+        function updateCellPlayers(position) {
+            const playersContainer = document.getElementById(`players-at-${position}`);
+            if (!playersContainer) return;
+            
+            playersContainer.innerHTML = '';
+            
+            const cellPlayers = gameState.board[position].players;
+            cellPlayers.forEach(playerId => {
+                const player = gameState.players.find(p => p.id === playerId);
+                if (player) {
+                    const token = document.createElement('div');
+                    token.className = `player-token w-6 h-6 rounded-full ${player.color} flex items-center justify-center text-white text-xs font-bold`;
+                    token.textContent = player.name.charAt(0).toUpperCase();
+                    playersContainer.appendChild(token);
+                }
+            });
+        }
+        
+        function updatePlayersUI() {
+            playersContainer.innerHTML = '';
+            
+            gameState.players.forEach((player, index) => {
+                const isCurrentPlayer = index === gameState.currentPlayerIndex;
+                const playerDiv = document.createElement('div');
+                playerDiv.className = `p-3 rounded-lg ${isCurrentPlayer ? 'bg-blue-50 border-2 border-blue-500' : 'bg-gray-50'}`;
+                
+                let statusText = '';
+                if (player.skipTurn) {
+                    statusText = '<span class="text-red-500">(Hilang Giliran)</span>';
+                } else if (player.extraTurn) {
+                    statusText = '<span class="text-green-500">(Giliran Tambahan)</span>';
+                }
+                
+                playerDiv.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full ${player.color} flex items-center justify-center text-white font-bold mr-3">
+                                ${player.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <div class="font-bold">${player.name} ${statusText}</div>
+                                <div class="text-sm text-gray-600">Markah: ${player.score}</div>
+                            </div>
+                        </div>
+                        ${isCurrentPlayer ? '<div class="text-blue-500 font-bold">Giliran Anda</div>' : ''}
+                    </div>
+                    <div class="mt-2">
+                        <input type="text" class="edit-player-name w-full px-3 py-1 border border-gray-300 rounded-md text-sm" 
+                               value="${player.name}" data-player-id="${player.id}">
+                    </div>
+                `;
+                
+                playersContainer.appendChild(playerDiv);
+            });
+            
+            // Add event listeners to name inputs
+            document.querySelectorAll('.edit-player-name').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const playerId = parseInt(e.target.dataset.playerId);
+                    const player = gameState.players.find(p => p.id === playerId);
+                    if (player) {
+                        player.name = e.target.value || `Pemain ${playerId + 1}`;
+                        updatePlayersUI();
+                        
+                        // Update player tokens on board
+                        gameState.board.forEach((cell, index) => {
+                            if (cell.players.includes(playerId)) {
+                                updateCellPlayers(index);
+                            }
+                        });
+                    }
+                });
+            });
+        }
+        
+        function startGameTimer() {
+            if (gameState.gameTimer) clearInterval(gameState.gameTimer);
+            
+            gameState.gameTimer = setInterval(() => {
+                if (gameState.isPaused) return;
+                
+                gameState.remainingTime--;
+                updateTimerDisplay();
+                
+                if (gameState.remainingTime <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+        
+        function updateTimerDisplay() {
+            const minutes = Math.floor(gameState.remainingTime / 60);
+            const seconds = gameState.remainingTime % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update timer bar
+            const percentage = (gameState.remainingTime / (gameState.gameDuration * 60)) * 100;
+            timerBar.style.width = `${percentage}%`;
+            
+            // Change color based on remaining time
+            if (percentage > 50) {
+                timerBar.classList.remove('bg-yellow-500', 'bg-red-500');
+                timerBar.classList.add('bg-blue-600');
+            } else if (percentage > 20) {
+                timerBar.classList.remove('bg-blue-600', 'bg-red-500');
+                timerBar.classList.add('bg-yellow-500');
+            } else {
+                timerBar.classList.remove('bg-blue-600', 'bg-yellow-500');
+                timerBar.classList.add('bg-red-500');
+            }
+        }
+        
+        function togglePause() {
+            gameState.isPaused = !gameState.isPaused;
+            
+            if (gameState.isPaused) {
+                pauseModal.classList.remove('hidden');
+            } else {
+                pauseModal.classList.add('hidden');
+            }
+        }
+        
+        function rollDice() {
+            if (gameState.isPaused) return;
+            
+            const rollBtn = document.getElementById('roll-dice');
+            rollBtn.disabled = true;
+            
+            // Animate dice
+            dice.classList.add('rolling');
+            dice.querySelector('#dice-value').textContent = '?';
+            
+            setTimeout(() => {
+                // Get random number
+                const diceValue = Math.floor(Math.random() * 6) + 1;
+                dice.querySelector('#dice-value').textContent = diceValue;
+                dice.classList.remove('rolling');
+                
+                // Move player
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                let newPosition = (currentPlayer.position + diceValue) % gameState.boardSize;
+                placePlayerOnBoard(currentPlayer, newPosition);
+                
+                // Check cell type and start appropriate action
+                setTimeout(() => {
+                    const cellCategory = gameState.board[newPosition].category;
+                    
+                    if (cellCategory === 'start') {
+                        // Player landed on start
+                        showResult(true, { points: 2 }, "Anda mendarat di petak MULA dan mendapat 2 markah bonus!");
+                        currentPlayer.score += 2;
+                    } else if (cellCategory === 'mystery') {
+                        // Player landed on mystery
+                        handleMysterySquare(currentPlayer);
+                    } else {
+                        // Player landed on a category square
+                        startChallenge(currentPlayer, cellCategory);
+                    }
+                }, 1000);
+            }, 1000);
+        }
+        
+        function handleMysterySquare(player) {
+            // Select random mystery effect
+            const mysteryEffect = mysteryEffects[Math.floor(Math.random() * mysteryEffects.length)];
+            
+            // Apply effect
+            const resultMessage = mysteryEffect.effect(player, gameState);
+            
+            // Show mystery modal
+            document.getElementById('mystery-content').innerHTML = `
+                <h3 class="font-bold text-xl mb-2">${mysteryEffect.name}</h3>
+                <p>${resultMessage}</p>
+            `;
+            
+            mysteryModal.classList.remove('hidden');
+            
+            // Update player UI to reflect any changes
+            updatePlayersUI();
+        }
+        
+        function continueMystery() {
+            mysteryModal.classList.add('hidden');
+            
+            // Move to next player
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            if (currentPlayer.extraTurn) {
+                // Player gets an extra turn
+                currentPlayer.extraTurn = false;
+                updatePlayersUI();
+            } else {
+                moveToNextPlayer();
+            }
+            
+            // Enable roll button
+            document.getElementById('roll-dice').disabled = false;
+        }
+        
+        function startChallenge(player, categoryKey) {
+            const category = categories[categoryKey];
+            gameState.currentCategory = category;
+            
+            // Select random challenge
+            const challenge = challenges[Math.floor(Math.random() * challenges.length)];
+            const challengeData = challenge.generateChallenge(category);
+            
+            gameState.currentChallenge = {
+                ...challenge,
+                ...challengeData,
+                category: category
+            };
+            
+            // Update challenge modal
+            document.getElementById('challenge-title').textContent = challenge.name;
+            document.getElementById('challenge-category-name').textContent = category.name;
+            document.getElementById('challenge-content').innerHTML = challengeData.question;
+            
+            // Create answer display
+            const answerContainer = document.getElementById('challenge-answer-container');
+            answerContainer.innerHTML = `
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <p class="text-center text-gray-500">Tekan <strong>Selesai</strong> jika anda berjaya menjawab soalan ini, atau <strong>Gagal</strong> jika anda tidak dapat menjawabnya.</p>
+                </div>
+            `;
+            
+            // Show challenge modal
+            challengeModal.classList.remove('hidden');
+            
+            // Start challenge timer
+            startChallengeTimer();
+        }
+        
+        function startChallengeTimer() {
+            const timerElement = document.getElementById('challenge-timer');
+            let timeLeft = 30; // 30 seconds for each challenge
+            
+            timerElement.textContent = timeLeft;
+            
+            if (gameState.challengeTimer) clearInterval(gameState.challengeTimer);
+            
+            gameState.challengeTimer = setInterval(() => {
+                if (gameState.isPaused) return;
+                
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(gameState.challengeTimer);
+                    submitAnswer(false); // Auto-fail when time's up
+                }
+            }, 1000);
+        }
+        
+        function submitAnswer(isSuccess) {
+            clearInterval(gameState.challengeTimer);
+            
+            const challenge = gameState.currentChallenge;
+            const player = gameState.players[gameState.currentPlayerIndex];
+            
+            // Award points if successful
+            if (isSuccess) {
+                player.score += challenge.points;
+            }
+            
+            // Show result
+            showResult(isSuccess, challenge);
+        }
+        
+        function showResult(isSuccess, challenge, customMessage = null) {
+            challengeModal.classList.add('hidden');
+            
+            const resultTitle = document.getElementById('result-title');
+            const resultContent = document.getElementById('result-content');
+            const resultPoints = document.getElementById('result-points');
+            
+            if (customMessage) {
+                // For custom messages (like landing on START)
+                resultTitle.textContent = 'Petak Khas';
+                resultContent.innerHTML = `<p>${customMessage}</p>`;
+                resultPoints.textContent = `+${challenge.points} markah`;
+            } else if (isSuccess) {
+                resultTitle.textContent = 'Tahniah!';
+                resultContent.innerHTML = `
+                    <p class="mb-2">Anda berjaya menyelesaikan cabaran!</p>
+                `;
+                resultPoints.textContent = `+${challenge.points} markah`;
+                
+                // Add confetti effect
+                createConfetti();
+            } else {
+                resultTitle.textContent = 'Cuba Lagi!';
+                resultContent.innerHTML = `
+                    <p class="mb-2">Anda tidak berjaya menyelesaikan cabaran.</p>
+                `;
+                resultPoints.textContent = '+0 markah';
+            }
+            
+            resultModal.classList.remove('hidden');
+        }
+        
+        function createConfetti() {
+            const confettiContainer = document.createElement('div');
+            confettiContainer.style.position = 'fixed';
+            confettiContainer.style.top = '0';
+            confettiContainer.style.left = '0';
+            confettiContainer.style.width = '100%';
+            confettiContainer.style.height = '100%';
+            confettiContainer.style.pointerEvents = 'none';
+            confettiContainer.style.zIndex = '9999';
+            document.body.appendChild(confettiContainer);
+            
+            const colors = ['#f39c12', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.top = `-10px`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = `${Math.random() * 3}s`;
+                confettiContainer.appendChild(confetti);
+            }
+            
+            setTimeout(() => {
+                confettiContainer.remove();
+            }, 3000);
+        }
+        
+        function continueGame() {
+            resultModal.classList.add('hidden');
+            
+            // Move to next player
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            if (currentPlayer.extraTurn) {
+                // Player gets an extra turn
+                currentPlayer.extraTurn = false;
+                updatePlayersUI();
+            } else {
+                moveToNextPlayer();
+            }
+            
+            // Enable roll button
+            document.getElementById('roll-dice').disabled = false;
+        }
+        
+        function moveToNextPlayer() {
+            let nextPlayerIndex;
+            let loopCount = 0;
+            const maxLoops = gameState.players.length * 2; // Prevent infinite loop
+            
+            do {
+                nextPlayerIndex = (gameState.currentPlayerIndex + 1) % gameState.players.length;
+                gameState.currentPlayerIndex = nextPlayerIndex;
+                
+                // Check if player should skip turn
+                if (gameState.players[nextPlayerIndex].skipTurn) {
+                    gameState.players[nextPlayerIndex].skipTurn = false; // Reset skip flag
+                    loopCount++;
+                } else {
+                    break;
+                }
+            } while (loopCount < maxLoops);
+            
+            updatePlayersUI();
+        }
+        
+        function endGame() {
+            clearInterval(gameState.gameTimer);
+            clearInterval(gameState.challengeTimer);
+            
+            // Find winner
+            let winner = gameState.players[0];
+            for (let i = 1; i < gameState.players.length; i++) {
+                if (gameState.players[i].score > winner.score) {
+                    winner = gameState.players[i];
+                }
+            }
+            
+            // Update game over modal
+            const winnerAnnouncement = document.getElementById('winner-announcement');
+            const finalScores = document.getElementById('final-scores');
+            
+            winnerAnnouncement.innerHTML = `
+                <p>Pemenang: <span class="font-bold">${winner.name}</span> dengan ${winner.score} markah!</p>
+            `;
+            
+            finalScores.innerHTML = '<h3 class="font-bold mb-2">Markah Akhir:</h3>';
+            
+            // Sort players by score
+            const sortedPlayers = [...gameState.players].sort((a, b) => b.score - a.score);
+            
+            sortedPlayers.forEach((player, index) => {
+                finalScores.innerHTML += `
+                    <div class="flex items-center justify-between p-2 ${index === 0 ? 'bg-yellow-100' : 'bg-gray-50'} rounded-lg mb-2">
+                        <div class="flex items-center">
+                            <div class="w-6 h-6 rounded-full ${player.color} flex items-center justify-center text-white font-bold mr-2">
+                                ${player.name.charAt(0).toUpperCase()}
+                            </div>
+                            <span>${player.name}</span>
+                        </div>
+                        <span class="font-bold">${player.score}</span>
+                    </div>
+                `;
+            });
+            
+            // Show game over modal
+            gameOverModal.classList.remove('hidden');
+        }
+        
+        function resetGame() {
+            clearInterval(gameState.gameTimer);
+            clearInterval(gameState.challengeTimer);
+            
+            gameState = {
+                players: [],
+                currentPlayerIndex: 0,
+                gameStarted: false,
+                gameDuration: 15,
+                gameTimer: null,
+                remainingTime: 0,
+                isPaused: false,
+                boardSize: 24,
+                board: [],
+                challengeTimer: null,
+                currentChallenge: null,
+                currentCategory: null
+            };
+            
+            // Reset UI
+            document.querySelectorAll('.player-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-500', 'text-white');
+            });
+            
+            playerNamesContainer.innerHTML = '';
+            durationDisplay.textContent = '15';
+            document.getElementById('game-duration').value = 15;
+        }
+        
+        // Initialize with 2 players by default
+        document.querySelector('.player-btn[data-players="2"]').click();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'935fa30a767d7137',t:'MTc0NTYwMjk0Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body></html>
